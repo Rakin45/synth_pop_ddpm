@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 
-data = pd.read_csv('./data/nts_toy_home_population.csv')
+data = pd.read_csv('./data/nts_population.csv')
 
 # Fred's encoder code
 class DescreteEncoder:
@@ -32,14 +32,10 @@ def create_image_grid(encoded_data, encoder):
     # Map pid to sequential indices starting from 0
     pid_to_index = {pid: index for index, pid in enumerate(encoded_data['pid'].unique())}
     
-    # Determine the size of the grid
     num_people = len(pid_to_index)
     time_steps = encoder.steps
-    
-    # Initialize an empty grid
     grid = np.zeros((num_people, time_steps))
     
-    # Populate the grid with encoded activity data
     for _, row in encoded_data.iterrows():
         pid_index = pid_to_index[row['pid']]
         act_index = row['act']
@@ -51,9 +47,8 @@ def create_image_grid(encoded_data, encoder):
 
 # Create the image grid
 image_grid = create_image_grid(encoded_data, encoder)
-
-# Check the shape of the resulting image grid and display a portion of it for visualization
-image_grid.shape, image_grid[:5, :10]  # Displaying first 5 rows and 10 columns of the grid
+tensor_image_grid = torch.tensor(image_grid)
+torch.save(tensor_image_grid, './data/image_grid.pt')
 
 print(image_grid.shape, image_grid[:5, :10])
 
