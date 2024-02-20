@@ -23,26 +23,27 @@ class DoubleConv(nn.Module):
             return self.double_conv(x)
 
 class SelfAttention(nn.Module):
-    def __init__(self, channels, size):
+    def __init__(self, channels, sequence_length = 144):
         super(SelfAttention, self).__init__()
         self.channels = channels
-        self.size = size
+        self.sequence_length = sequence_length
         self.mha = nn.MultiheadAttention(channels, 4, batch_first=True)
-        self.ln = nn.LayerNorm([channels])
+        self.ln = nn.LayerNorm([sequence_length])
         self.ff_self = nn.Sequential(
-            nn.LayerNorm([channels]),
-            nn.Linear(channels, channels),
+            nn.LayerNorm([sequence_length]),
+            nn.Linear(sequence_length, sequence_length),
             nn.GELU(),
-            nn.Linear(channels, channels),
+            nn.Linear(sequence_length, sequence_length),
         )
 
     def forward(self, x):
-        x = x.view(-1, self.channels, self.size * self.size).swapaxes(1, 2)
+        # x is of shape (batch, channels, sequence_length)
         x_ln = self.ln(x)
         attention_value, _ = self.mha(x_ln, x_ln, x_ln)
         attention_value = attention_value + x
         attention_value = self.ff_self(attention_value) + attention_value
-        return attention_value.swapaxes(2, 1).view(-1, self.channels, self.size, self.size)
+        return attention_value
+
     
 class Down(nn.Module):
     def __init__(self, in_channels, out_channels, emb_dim=256):
@@ -62,7 +63,7 @@ class Down(nn.Module):
 
     def forward(self, x, t):
         x = self.maxpool_conv(x)
-        emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
+        emb = self.emb_layer(t)[:, :, None].repeat(1, 1, x.shape[-1])
         return x + emb
     
 class Up(nn.Module):
@@ -86,7 +87,7 @@ class Up(nn.Module):
         x = self.up(x)
         x = torch.cat([skip_x, x], dim=1)
         x = self.conv(x)
-        emb = self.emb_layer(t)[:, :, None, None].repeat(1, 1, x.shape[-2], x.shape[-1])
+        emb = self.emb_layer(t)[:, :, None].repeat(1, 1, x.shape[-1])
         return x + emb
     
 class UNet(nn.Module):
