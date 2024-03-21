@@ -1,4 +1,4 @@
-# synth_pop_ddpm
+# One Hot Encoded is the best performing model!
 Synthetic Population Generation Using a Denoising Diffusion Probabilistic Model
 
 
