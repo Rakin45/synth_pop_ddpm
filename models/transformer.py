@@ -10,7 +10,7 @@ class TransformerWithPositionalEncoding(nn.Module):
         self.time_embedding = nn.Embedding(max_time_steps, feature_size)
 
         self.pos_encoder = PositionalEncoding(feature_size)
-        self.encoder_layer = nn.TransformerEncoderLayer(d_model=feature_size, nhead=8, dropout=dropout, batch_first=True)
+        self.encoder_layer = nn.TransformerEncoderLayer(d_model=feature_size, nhead=3, dropout=dropout, batch_first=True)
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=num_layers)
         self.decoder = nn.Linear(feature_size, feature_size)                                                                                                    
         self.init_weights()
