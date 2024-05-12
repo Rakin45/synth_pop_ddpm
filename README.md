@@ -1,4 +1,3 @@
-# [One Hot Encoded is the best performing model](https://github.com/Rakin45/synth_pop_ddpm/blob/main/one_hot_ddpm.ipynb)
 Synthetic Population Generation Using a Denoising Diffusion Probabilistic Model
 
 
